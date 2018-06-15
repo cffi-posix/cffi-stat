@@ -63,13 +63,13 @@
 (defmacro stat-gen (stat)
   `(foreign-slot-value ,stat '(:struct stat) 'st-gen))
 
-(defun s-isdir  (m) (= #o040000 (logand #o170000 m)))
-(defun s-ischr  (m) (= #o020000 (logand #o170000 m)))
-(defun s-isblk  (m) (= #o060000 (logand #o170000 m)))
-(defun s-isreg  (m) (= #o100000 (logand #o170000 m)))
-(defun s-isfifo (m) (= #o010000 (logand #o170000 m)))
-(defun s-islnk  (m) (= #o120000 (logand #o170000 m)))
-(defun s-issock (m) (= #o140000 (logand #o170000 m)))
+(defun s-isdir  (m) (= #o040000 (logand #o170000 (the fixnum m))))
+(defun s-ischr  (m) (= #o020000 (logand #o170000 (the fixnum m))))
+(defun s-isblk  (m) (= #o060000 (logand #o170000 (the fixnum m))))
+(defun s-isreg  (m) (= #o100000 (logand #o170000 (the fixnum m))))
+(defun s-isfifo (m) (= #o010000 (logand #o170000 (the fixnum m))))
+(defun s-islnk  (m) (= #o120000 (logand #o170000 (the fixnum m))))
+(defun s-issock (m) (= #o140000 (logand #o170000 (the fixnum m))))
 
 (defcfun ("fstat" c-fstat) :int
   (fd :int)
@@ -88,7 +88,7 @@
 
 (defmacro with-stat ((var &optional (error-p t)) path &body body)
   `(with-foreign-object (,var '(:struct stat))
-     (cond ((= 0 (c-stat ,path ,var))
+     (cond ((= 0 (the fixnum (c-stat ,path ,var)))
             (locally ,@body))
            ,@(when error-p
                `((t (error-errno "stat")))))))
