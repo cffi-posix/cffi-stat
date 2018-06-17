@@ -88,7 +88,7 @@
          (sb (:pointer (:struct stat))))
        (defmacro with-fstat ((var &optional (error-p t)) fd &body body)
          `(with-foreign-object (,var '(:struct stat))
-            (cond ((= 0 (c-__fxstat 3 ,fd ,var))
+            (cond ((= 0 (c-__fxstat +stat-ver+ ,fd ,var))
                    (locally ,@body))
                   ,@(when error-p
                       `((t (error-errno "__fxstat")))))))))
@@ -110,7 +110,7 @@
          (sb (:pointer (:struct stat))))
        (defmacro with-stat ((var &optional (error-p t)) path &body body)
          `(with-foreign-object (,var '(:struct stat))
-            (cond ((= 0 (the fixnum (c-__xstat 3 ,path ,var)))
+            (cond ((= 0 (the fixnum (c-__xstat +stat-ver+ ,path ,var)))
                    (locally ,@body))
                   ,@(when error-p
                       `((t (error-errno "__xstat")))))))))
@@ -132,7 +132,7 @@
          (sb (:pointer (:struct stat))))
        (defmacro with-lstat ((var &optional (error-p t)) path &body body)
          `(with-foreign-object (,var '(:struct stat))
-            (cond ((= 0 (c-__lxstat 3 ,path ,var))
+            (cond ((= 0 (c-__lxstat +stat-ver+ ,path ,var))
                    (locally ,@body))
                   ,@(when error-p
                       `((t (error-errno "__lxstat")))))))))

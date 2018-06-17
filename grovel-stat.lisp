@@ -40,6 +40,9 @@
          (tv-nsec "tv_nsec" :type :long))
 
 #+linux
+(constant (+stat-ver+ "_STAT_VER"))
+
+#+linux
 (cstruct stat "struct stat"
          (st-mode "st_mode" :type mode-t)
          (st-dev "st_dev" :type dev-t)
