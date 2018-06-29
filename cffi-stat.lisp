@@ -71,68 +71,35 @@
 (defun s-islnk  (m) (= #o120000 (logand #o170000 (the fixnum m))))
 (defun s-issock (m) (= #o140000 (logand #o170000 (the fixnum m))))
 
-(cond ((foreign-symbol-pointer "fstat")
-       (defcfun ("fstat" c-fstat) :int
-         (fd :int)
-         (sb (:pointer (:struct stat))))
-       (defmacro with-fstat ((var &optional (error-p t)) fd &body body)
-         `(with-foreign-object (,var '(:struct stat))
-            (cond ((= 0 (c-fstat ,fd ,var))
-                   (locally ,@body))
-                  ,@(when error-p
-                      `((t (error-errno "fstat"))))))))
-      ((foreign-symbol-pointer "__fxstat")
-       (defcfun ("__fxstat" c-__fxstat) :int
-         (ver :int)
-         (fd :int)
-         (sb (:pointer (:struct stat))))
-       (defmacro with-fstat ((var &optional (error-p t)) fd &body body)
-         `(with-foreign-object (,var '(:struct stat))
-            (cond ((= 0 (c-__fxstat +stat-ver+ ,fd ,var))
-                   (locally ,@body))
-                  ,@(when error-p
-                      `((t (error-errno "__fxstat")))))))))
+(defcfun ("fstat" c-fstat) :int
+  (fd :int)
+  (sb (:pointer (:struct stat))))
 
-(cond ((foreign-symbol-pointer "stat")
-       (defcfun ("stat" c-stat) :int
-         (path :string)
-         (sb (:pointer (:struct stat))))
-       (defmacro with-stat ((var &optional (error-p t)) path &body body)
-         `(with-foreign-object (,var '(:struct stat))
-            (cond ((= 0 (the fixnum (c-stat ,path ,var)))
-                   (locally ,@body))
-                  ,@(when error-p
-                      `((t (error-errno "stat"))))))))
-      ((foreign-symbol-pointer "__xstat")
-       (defcfun ("__xstat" c-__xstat) :int
-         (ver :int)
-         (path :string)
-         (sb (:pointer (:struct stat))))
-       (defmacro with-stat ((var &optional (error-p t)) path &body body)
-         `(with-foreign-object (,var '(:struct stat))
-            (cond ((= 0 (the fixnum (c-__xstat +stat-ver+ ,path ,var)))
-                   (locally ,@body))
-                  ,@(when error-p
-                      `((t (error-errno "__xstat")))))))))
+(defmacro with-fstat ((var &optional (error-p t)) fd &body body)
+  `(with-foreign-object (,var '(:struct stat))
+     (cond ((= 0 (c-fstat ,fd (mem-aptr ,var '(:struct stat))))
+            (locally ,@body))
+           ,@(when error-p
+               `((t (error-errno "fstat")))))))
 
-(cond ((foreign-symbol-pointer "lstat")
-       (defcfun ("lstat" c-lstat) :int
-         (path :string)
-         (sb (:pointer (:struct stat))))
-       (defmacro with-lstat ((var &optional (error-p t)) path &body body)
-         `(with-foreign-object (,var '(:struct stat))
-            (cond ((= 0 (c-lstat ,path ,var))
-                   (locally ,@body))
-                  ,@(when error-p
-                      `((t (error-errno "lstat"))))))))
-      ((foreign-symbol-pointer "__lxstat")
-       (defcfun ("__lxstat" c-__lxstat) :int
-         (ver :int)
-         (path :string)
-         (sb (:pointer (:struct stat))))
-       (defmacro with-lstat ((var &optional (error-p t)) path &body body)
-         `(with-foreign-object (,var '(:struct stat))
-            (cond ((= 0 (c-__lxstat +stat-ver+ ,path ,var))
-                   (locally ,@body))
-                  ,@(when error-p
-                      `((t (error-errno "__lxstat")))))))))
+(defcfun ("stat" c-stat) :int
+  (path :string)
+  (sb (:pointer (:struct stat))))
+
+(defmacro with-stat ((var &optional (error-p t)) path &body body)
+  `(with-foreign-object (,var '(:struct stat))
+     (cond ((= 0 (the fixnum (c-stat ,path ,var)))
+            (locally ,@body))
+           ,@(when error-p
+               `((t (error-errno "stat")))))))
+
+(defcfun ("lstat" c-lstat) :int
+  (path :string)
+  (sb (:pointer (:struct stat))))
+
+(defmacro with-lstat ((var &optional (error-p t)) path &body body)
+  `(with-foreign-object (,var '(:struct stat))
+     (cond ((= 0 (c-lstat ,path ,var))
+            (locally ,@body))
+           ,@(when error-p
+               `((t (error-errno "lstat")))))))
