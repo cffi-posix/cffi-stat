@@ -20,7 +20,7 @@
 
 (include "sys/types.h")
 (include "sys/stat.h")
-(include "sys/unistd.h")
+(include "unistd.h")
 
 (ctype blkcnt-t "blkcnt_t")
 (ctype blksize-t "blksize_t")
@@ -40,23 +40,20 @@
          (tv-nsec "tv_nsec" :type :long))
 
 #+linux
-(constant (+stat-ver+ "_STAT_VER"))
-
-#+linux
 (cstruct stat "struct stat"
-         (st-mode "st_mode" :type mode-t)
          (st-dev "st_dev" :type dev-t)
          (st-ino "st_ino" :type ino-t)
+         (st-mode "st_mode" :type mode-t)
          (st-nlink "st_nlink" :type nlink-t)
          (st-uid "st_uid" :type uid-t)
          (st-gid "st_gid" :type gid-t)
          (st-rdev "st_rdev" :type dev-t)
+         (st-size "st_size" :type off-t)
+         (st-blksize "st_blksize" :type blksize-t)
+         (st-blocks "st_blocks" :type blkcnt-t)
          (st-atim "st_atim" :type (:struct timespec))
          (st-mtim "st_mtim" :type (:struct timespec))
-         (st-ctim "st_ctim" :type (:struct timespec))
-         (st-size "st_size" :type off-t)
-         (st-blocks "st_blocks" :type blkcnt-t)
-         (st-blksize "st_blksize" :type blksize-t))
+         (st-ctim "st_ctim" :type (:struct timespec)))
 
 #+openbsd
 (cstruct stat "struct stat"
